@@ -1,33 +1,59 @@
 package com.sm.expose.global.config;
 
+import com.sm.expose.global.security.filter.TokenAuthenticationFilter;
+import com.sm.expose.global.security.handler.OAuth2AuthenticationSuccessHandler;
 import com.sm.expose.global.security.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@EnableWebSecurity // spring security 설정을 활성화시켜주는 어노테이션
+@Configuration
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final CustomOAuth2UserService oAuthService;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
-    public SecurityConfig(CustomOAuth2UserService oAuthService) {
-        this.oAuthService = oAuthService;
+    public SecurityConfig(@Lazy CustomOAuth2UserService customOAuth2UserService, OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler, TokenAuthenticationFilter tokenAuthenticationFilter) {
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
+        this.tokenAuthenticationFilter = tokenAuthenticationFilter;
     }
 
-        //AuthenticationManagerBean 등록 -> 하단의 configure에서 LoginForm을 이용한 자동 처리 사용 X,
-    // 수동으로 Authentication을 만들어서 SecurityContext에 저장
-    @Bean
+    //AuthenticationManagerBean 등록 ->
+    // 하단의 configure에서 LoginForm을 이용한 자동 처리 사용 X, 수동으로 Authentication을 만들어서 SecurityContext에 저장
+    @Bean(BeanIds.AUTHENTICATION_MANAGER)
     @Override
-    public AuthenticationManager authenticationManagerBean()  throws Exception{
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.oauth2Login() // OAuth2 로그인 설정 시작점
-                .userInfoEndpoint() // OAuth2 로그인 성공 이후 사용자 정보를 가져올 때 설정 담당
-                .userService(oAuthService); // OAuth2 로그인 성공 시, 후작업을 진행할 UserService 인터페이스 구현체 등록
+        http
+                .cors().and()
+                .csrf().disable()
+                .headers().frameOptions().disable()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .oauth2Login()
+                .userInfoEndpoint()// 로그인 성공 후 사용자 정보를 가져옴
+                .userService(customOAuth2UserService)// userInfoEndpoint()로 가져온 사용자 정보를 처리할 때 사용
+                .and()
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .and()
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 }

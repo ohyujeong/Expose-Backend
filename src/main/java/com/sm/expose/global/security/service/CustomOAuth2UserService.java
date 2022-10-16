@@ -28,41 +28,60 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         this.userDetailsService = userDetailsService;
     }
 
-    /**
-     * 서드파티 접근을 위한 accessToken까지 얻은다음 실행된다.
-     */
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
         /** 유저의 정보를 가져옴 */
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-//        /** 인증 서버 (구글) 의 정보를 가져옴 */
-//        String provider = userRequest.getClientRegistration().getRegistrationId();
+        return processOAuthUser(userRequest, oAuth2User);
 
-        /**
-         * 새 유저 객체
-         */
+    }
+
+
+    /**
+     * 사용자 정보 추출
+     * @param userRequest
+     * @param oAuth2User
+     * @return
+     */
+    private OAuth2User processOAuthUser(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
         GoogleOAuth2User googleOAuth2User = new GoogleOAuth2User(oAuth2User.getAttributes());
-
         String email = googleOAuth2User.getEmail();
         String name = googleOAuth2User.getName();
         String profileImage = googleOAuth2User.getProfileImage();
 
-        User existUser = userDetailsService.findByEmail(email);
+        User user = userDetailsService.findByEmail(email);
 
         //DB에 없는 사용자라면 회원가입처리
-        if (existUser == null) {
-            existUser = User.builder()
+        if (user == null) {
+            user = registerNewUser(googleOAuth2User);
+        }
+        else{
+            user = updateExistingUser(user, googleOAuth2User);
+        }
+
+        return UserPrincipal.create(user, oAuth2User.getAttributes());
+    }
+
+    private User updateExistingUser(User user, GoogleOAuth2User googleOAuth2User) {
+        return userDetailsService.updateUser(user,googleOAuth2User);
+    }
+
+    private User registerNewUser(GoogleOAuth2User googleOAuth2User) {
+        String email = googleOAuth2User.getEmail();
+        String name = googleOAuth2User.getName();
+        String profileImage = googleOAuth2User.getProfileImage();
+
+        User registerUser = User.builder()
                     .email(email)
                     .name(name)
                     .profileImage(profileImage)
                     .role(Role.USER)
                     .build();
-            existUser.setProviderType(ProviderType.google);
-            userDetailsService.saveUser(existUser);
-        }
-
-        return UserPrincipal.create(existUser, oAuth2User.getAttributes());
+        registerUser.setProviderType(ProviderType.google);
+        userDetailsService.saveUser(registerUser);
+        registerUser = userDetailsService.findByEmail(registerUser.getEmail());
+        return registerUser;
     }
 }

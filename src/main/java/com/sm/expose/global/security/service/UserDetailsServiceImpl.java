@@ -2,6 +2,7 @@ package com.sm.expose.global.security.service;
 
 import com.sm.expose.global.security.domain.User;
 import com.sm.expose.global.security.domain.UserPrincipal;
+import com.sm.expose.global.security.dto.GoogleOAuth2User;
 import com.sm.expose.global.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public void saveUser(User user){
         userRepository.save(user);
+    }
+
+    public User updateUser(User user, GoogleOAuth2User googleOAuth2User){
+        return userRepository.save(user.update(googleOAuth2User.getName(), googleOAuth2User.getProfileImage()));
     }
 
     // loadUserByUsername 은 DB에 접근해서 사용자 정보를 가져오는 역할을 함

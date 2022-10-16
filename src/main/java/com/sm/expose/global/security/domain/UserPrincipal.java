@@ -8,13 +8,13 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.*;
 
-///*
-//https://yelimkim98.tistory.com/48
-// */
-///**
-// * 원하는 형태로 CustomUserDetails를 세팅해준 후 리턴해주면
-// * Spring Security에서는 해당 유저의 정보를 조회할 때에는 CustomUserDetails에 세팅된 값으로 조회를 한 후 로직을 처리
-// */
+/**
+ * 원하는 형태로 CustomUserDetails를 세팅해준 후 리턴해주면
+ * Spring Security에서는 해당 유저의 정보를 조회할 때에는 CustomUserDetails에 세팅된 값으로 조회를 한 후 로직을 처리
+ */
+/**
+ * User를 생성자로 전달받아 Spring Security에 User 정보 전달
+ */
 @Getter
 public class UserPrincipal implements OAuth2User, UserDetails {
 
@@ -33,7 +33,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
      * OAuth2 로그인시 사용
      */
     public static UserPrincipal create(User user, Map<String, Object> oauthUserAttributes) {
-        return new UserPrincipal(user, List.of(() -> "ROLE_USER"), oauthUserAttributes);
+                return new UserPrincipal(user, List.of(() -> "ROLE_USER"), oauthUserAttributes);
     }
 
     public static UserPrincipal create(User user) {
@@ -81,6 +81,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     public <A> A getAttribute(String name) {
         return (A) oauthUserAttributes.get(name);
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
