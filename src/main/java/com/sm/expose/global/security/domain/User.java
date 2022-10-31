@@ -19,8 +19,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(name = "name", length = 50)
-    private String name;
+    @Column(name = "nickname", length = 50)
+    private String nickname;
 
     @Column(name = "email", length = 50, unique = true)
     private String email;
@@ -41,16 +41,16 @@ public class User {
 
 
     @Builder
-    public User(String email, String name, String password, String profileImage, Role role) {
+    public User(String email, String nickname, String password, String profileImage, Role role) {
         this.email = email;
-        this.name = name;
+        this.nickname = nickname;
         this.password = password;
         this.profileImage = profileImage;
         this.role = role;
     }
 
-    public User update(String name, String profileImage) {
-        this.name = name;
+    public User update(String nickname, String profileImage) {
+        this.nickname = nickname;
         this.profileImage = profileImage;
         return this;
     }

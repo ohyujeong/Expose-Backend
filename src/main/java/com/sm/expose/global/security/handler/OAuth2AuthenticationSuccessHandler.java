@@ -34,7 +34,7 @@ import static com.sm.expose.global.security.repository.HttpCookieOAuth2Authoriza
 @PropertySource("application.properties")
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String redirectUri;
     private final TokenProvider tokenProvider;
     private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;

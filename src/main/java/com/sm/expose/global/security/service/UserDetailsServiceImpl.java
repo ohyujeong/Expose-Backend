@@ -5,8 +5,8 @@ import com.sm.expose.global.security.domain.Role;
 import com.sm.expose.global.security.domain.User;
 import com.sm.expose.global.security.domain.UserPrincipal;
 import com.sm.expose.global.security.dto.AuthResponse;
-import com.sm.expose.global.security.dto.AuthorizationGoogle;
-import com.sm.expose.global.security.dto.GoogleOAuth2User;
+import com.sm.expose.global.security.dto.AuthorizationKakao;
+import com.sm.expose.global.security.dto.KakaoOAuth2User;
 import com.sm.expose.global.security.oauth.ProviderType;
 import com.sm.expose.global.security.provider.TokenProvider;
 import com.sm.expose.global.security.repository.UserRepository;
@@ -28,14 +28,14 @@ import javax.transaction.Transactional;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final OAuth2Google oAuth2Google;
+    private final OAuth2Kakao oAuth2Kakao;
     private final AuthenticationManager authManager;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final TokenProvider tokenProvider;
 
-    public UserDetailsServiceImpl(UserRepository userRepository, OAuth2Google oAuth2Google, @Lazy AuthenticationManager authManager, @Lazy BCryptPasswordEncoder bCryptPasswordEncoder, TokenProvider tokenProvider) {
+    public UserDetailsServiceImpl(UserRepository userRepository, OAuth2Kakao oAuth2Kakao, @Lazy AuthenticationManager authManager, @Lazy BCryptPasswordEncoder bCryptPasswordEncoder, TokenProvider tokenProvider) {
         this.userRepository = userRepository;
-        this.oAuth2Google = oAuth2Google;
+        this.oAuth2Kakao = oAuth2Kakao;
         this.authManager = authManager;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.tokenProvider = tokenProvider;
@@ -50,8 +50,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public User updateUser(User user, GoogleOAuth2User googleOAuth2User){
-        return userRepository.save(user.update(googleOAuth2User.getName(), googleOAuth2User.getProfileImage()));
+    public User updateUser(User user, KakaoOAuth2User kakaoOAuth2User){
+        return userRepository.save(user.update(kakaoOAuth2User.getName(), kakaoOAuth2User.getProfileImage()));
     }
 
     // loadUserByUsername 은 DB에 접근해서 사용자 정보를 가져오는 역할을 함
@@ -65,21 +65,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public AuthResponse oauth2AuthorizationGoogle(String code) throws JsonProcessingException {
-        AuthorizationGoogle authorization = oAuth2Google.callTokenApi(code);
-        System.out.println("authorization = " + authorization.getAccess_token());
-        GoogleOAuth2User googleUserInfo = oAuth2Google.callGetUserByAccessToken(authorization.getAccess_token());
-        System.out.println("googleUserInfo = " + googleUserInfo.getAttributes());
+        AuthorizationKakao authorization = oAuth2Kakao.callTokenApi(code);
+        KakaoOAuth2User googleUserInfo = oAuth2Kakao.callGetUserByAccessToken(authorization.getAccess_token());
 
         String email = googleUserInfo.getEmail();
         String profileImage = googleUserInfo.getProfileImage();
         String password = googleUserInfo.getProviderId() + email;
-        String name = googleUserInfo.getName();
+        String nickname = googleUserInfo.getName();
         User user = findByEmail(email);
 
         if (user == null) {
             String encodedPassword = bCryptPasswordEncoder.encode(password);
-            user = new User(email, name, encodedPassword, profileImage, Role.USER);
-            user.setProviderType(ProviderType.google);
+            user = new User(email, nickname, encodedPassword, profileImage, Role.USER);
+            user.setProviderType(ProviderType.kakao);
             userRepository.save(user);
         }
 

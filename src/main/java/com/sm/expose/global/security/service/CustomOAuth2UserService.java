@@ -3,7 +3,7 @@ package com.sm.expose.global.security.service;
 import com.sm.expose.global.security.domain.Role;
 import com.sm.expose.global.security.domain.User;
 import com.sm.expose.global.security.domain.UserPrincipal;
-import com.sm.expose.global.security.dto.GoogleOAuth2User;
+import com.sm.expose.global.security.dto.KakaoOAuth2User;
 import com.sm.expose.global.security.oauth.ProviderType;
 import lombok.SneakyThrows;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -47,38 +47,38 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
      * @return
      */
     private OAuth2User processOAuthUser(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
-        GoogleOAuth2User googleOAuth2User = new GoogleOAuth2User(oAuth2User.getAttributes());
-        String email = googleOAuth2User.getEmail();
+        KakaoOAuth2User kakaoOAuth2User = new KakaoOAuth2User(oAuth2User.getAttributes());
+        String email = kakaoOAuth2User.getEmail();
 
         User user = userDetailsService.findByEmail(email);
 
         //DB에 없는 사용자라면 회원가입처리
         if (user == null) {
-            user = registerNewUser(googleOAuth2User);
+            user = registerNewUser(kakaoOAuth2User);
         }
         else{
-            user = updateExistingUser(user, googleOAuth2User);
+            user = updateExistingUser(user, kakaoOAuth2User);
         }
 
         return UserPrincipal.create(user, oAuth2User.getAttributes());
     }
 
-    private User updateExistingUser(User user, GoogleOAuth2User googleOAuth2User) {
-        return userDetailsService.updateUser(user,googleOAuth2User);
+    private User updateExistingUser(User user, KakaoOAuth2User kakaoOAuth2User) {
+        return userDetailsService.updateUser(user, kakaoOAuth2User);
     }
 
-    private User registerNewUser(GoogleOAuth2User googleOAuth2User) {
-        String email = googleOAuth2User.getEmail();
-        String name = googleOAuth2User.getName();
-        String profileImage = googleOAuth2User.getProfileImage();
+    private User registerNewUser(KakaoOAuth2User kakaoOAuth2User) {
+        String email = kakaoOAuth2User.getEmail();
+        String nickname = kakaoOAuth2User.getName();
+        String profileImage = kakaoOAuth2User.getProfileImage();
 
         User registerUser = User.builder()
                     .email(email)
-                    .name(name)
+                    .nickname(nickname)
                     .profileImage(profileImage)
                     .role(Role.USER)
                     .build();
-        registerUser.setProviderType(ProviderType.google);
+        registerUser.setProviderType(ProviderType.kakao);
         userDetailsService.saveUser(registerUser);
         registerUser = userDetailsService.findByEmail(registerUser.getEmail());
         return registerUser;

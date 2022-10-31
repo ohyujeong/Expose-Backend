@@ -6,12 +6,16 @@ import java.util.Map;
 OAuth 인증에 성공하면 Spring OAuth에 의해 전달될 OAuth2User 클래스의 인스턴스 매핑
 getName() 을 재정의하고 getEmail() 메서드를 코딩하여 사용자 이름과 이메일을 각각 반환
  */
-public class GoogleOAuth2User implements OAuth2UserImpl {
+public class KakaoOAuth2User implements OAuth2UserImpl {
 
     private Map<String, Object> attributes;
+    private Map<String, Object> attributesAccount;
+    private Map<String, Object> attributesProfile;
 
-    public GoogleOAuth2User(Map<String, Object> attributes) {
+    public KakaoOAuth2User(Map<String, Object> attributes) {
         this.attributes = attributes;
+        this.attributesAccount = (Map<String, Object>) attributes.get("kakao_account");
+        this.attributesProfile = (Map<String, Object>) attributesAccount.get("profile");
     }
 
     @Override
@@ -21,26 +25,26 @@ public class GoogleOAuth2User implements OAuth2UserImpl {
 
     @Override
     public String getProviderId() {
-        return attributes.get("sub").toString();
+        return attributes.get("id").toString();
     }
 
     @Override
     public String getProviderType() {
-        return "google";
+        return "kakao";
     }
 
     @Override
     public String getEmail() {
-        return attributes.get("email").toString();
+        return attributesAccount.get("email").toString();
     }
 
     @Override
     public String getName() {
-        return attributes.get("name").toString();
+        return attributesProfile.get("nickname").toString();
     }
 
     @Override
     public String getProfileImage() {
-        return attributes.get("picture").toString();
+        return attributesProfile.get("thumbnail_image_url").toString();
     }
 }

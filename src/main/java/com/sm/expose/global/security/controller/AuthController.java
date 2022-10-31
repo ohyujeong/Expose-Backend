@@ -32,8 +32,8 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/login/oauth2/code/google")
-    public ResponseEntity<ResponseMessage> oauth2AuthorizationGoogle(@RequestParam("code") String code) throws JsonProcessingException {
+    @GetMapping("/oauth/callback/kakao")
+    public ResponseEntity<ResponseMessage> oauth2AuthorizationKaKao(@RequestParam("code") String code) throws JsonProcessingException {
         AuthResponse authResponse = userDetailsService.oauth2AuthorizationGoogle(code);
         return new ResponseEntity<>(ResponseMessage.withData(200, "로그인 성공", authResponse), HttpStatus.OK);
     }
