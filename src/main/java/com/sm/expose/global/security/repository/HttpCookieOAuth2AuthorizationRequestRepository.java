@@ -46,6 +46,7 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements
                 CookieUtil.serialize(authorizationRequest), cookieExpireSeconds);
 
         String redirectUriAfterLogin = request.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME);
+
         if (StringUtils.isNotBlank(redirectUriAfterLogin)) {
             CookieUtil.addCookie(response, REDIRECT_URI_PARAM_COOKIE_NAME, redirectUriAfterLogin, cookieExpireSeconds);
         }

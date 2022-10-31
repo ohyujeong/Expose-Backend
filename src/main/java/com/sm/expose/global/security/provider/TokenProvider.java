@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 유요한 JWT 토큰 생성
+ * 유효한 JWT 토큰 생성
  */
 @Slf4j
 @Component
@@ -108,20 +108,11 @@ public class TokenProvider {
              * - parseClaimsJws(accessToken) 까지하면 Jws<Claims>
              * - JWS(JSON Web Signature) : 서버에서 인증을 증거로 인증 정보를 서버의 private key로 서명한 것을 토큰화한 것
              * */
-            //setSignKey(secretKey)
+            //setSignKey(secretKey) - 이걸로 하면 서명키 안 맞음
             return Jwts.parserBuilder().setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8)).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
-    }
-
-    public Long getUserIdFromToken(String token) {
-        byte[] signingKey = secretKey.getBytes();
-        Claims claims = Jwts.parser()
-                .setSigningKey(Keys.hmacShaKeyFor(signingKey))
-                .parseClaimsJws(token)
-                .getBody();
-        return Long.parseLong(claims.getSubject());
     }
 
     public boolean validateToken(String token) {
@@ -129,7 +120,6 @@ public class TokenProvider {
             Jwts.parserBuilder().setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8)).build().parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            System.out.println("1");
             log.info("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
             log.info("만료된 JWT 토큰입니다.");

@@ -20,6 +20,11 @@ public class GoogleOAuth2User implements OAuth2UserImpl {
     }
 
     @Override
+    public String getProviderId() {
+        return attributes.get("sub").toString();
+    }
+
+    @Override
     public String getProviderType() {
         return "google";
     }

@@ -2,7 +2,6 @@ package com.sm.expose.global.security.filter;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.sm.expose.global.security.provider.TokenProvider;
-import com.sm.expose.global.security.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +26,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
     private final TokenProvider tokenProvider;
-    private final UserDetailsServiceImpl customUserDetailsService;
+//    private final UserDetailsServiceImpl customUserDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {

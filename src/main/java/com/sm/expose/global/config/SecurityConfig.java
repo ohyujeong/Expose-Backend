@@ -2,6 +2,7 @@ package com.sm.expose.global.config;
 
 import com.sm.expose.global.security.filter.TokenAuthenticationFilter;
 import com.sm.expose.global.security.handler.OAuth2AuthenticationSuccessHandler;
+import com.sm.expose.global.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.sm.expose.global.security.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +22,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
-    public SecurityConfig(@Lazy CustomOAuth2UserService customOAuth2UserService, OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler, TokenAuthenticationFilter tokenAuthenticationFilter) {
+    public SecurityConfig(@Lazy CustomOAuth2UserService customOAuth2UserService, OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler, TokenAuthenticationFilter tokenAuthenticationFilter, HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
         this.tokenAuthenticationFilter = tokenAuthenticationFilter;
+        this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
     }
 
     //AuthenticationManagerBean 등록 ->
@@ -48,6 +51,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize")
+                //authorization request cookie에 저장
+                .authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/login/oauth2/code/**")
+                .and()
                 .userInfoEndpoint()// 로그인 성공 후 사용자 정보를 가져옴
                 .userService(customOAuth2UserService)// userInfoEndpoint()로 가져온 사용자 정보를 처리할 때 사용
                 .and()
