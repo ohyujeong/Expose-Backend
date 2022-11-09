@@ -8,11 +8,10 @@ import com.sm.expose.frame.dto.FrameUploadDto;
 import com.sm.expose.frame.service.AwsS3Service;
 import com.sm.expose.frame.service.CategoryService;
 import com.sm.expose.frame.service.FrameService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,17 +25,17 @@ public class FrameController {
     private final FrameService frameService;
     private final CategoryService categoryService;
 
-//    @ApiOperation(value = "프레임 조회(필터링)", notes = "프레임 필터링 조회 엔드 포인트, ")
-//    @ApiImplicitParam(name="category", value = "category1,category2")
-//    @GetMapping()
-//    public EntityResponseDto.getFrameAllResponseDto getStudies(
-//            @RequestParam(name="category", required = false) String category,
-//            @PageableDefault(size=5, sort="createAt", direction = Sort.Direction.DESC) Pageable pageable) {
-//
-//        Page<FrameDetailDto> responseData = frameService.getFrames(category, pageable);
-//        return new EntityResponseDto.getFrameAllResponseDto(200, "스터디 조회 성공", responseData.getContent(), responseData.getPageable(), responseData.getTotalPages(), responseData.getTotalElements());
-//    }
+    @ApiOperation(value = "프레임 카테고리별 조회", notes = "프레임 카테고리별 조회 엔드 포인트")
+    @ApiImplicitParam(name="category", value = "category1,category2")
+    @GetMapping()
+    public EntityResponseDto.getFrameAllResponseDto getStudies(
+            @RequestParam(name="category", required = false) String category) {
 
+        List<FrameDetailDto> responseData = frameService.getFramesByCategory(category);
+        return new EntityResponseDto.getFrameAllResponseDto(200, "프레임 조회 성공", responseData);
+    }
+
+    @ApiOperation(value = "프레임 업로드", notes = "프레임 업로드 엔드포인트")
     @PostMapping(consumes = {"multipart/form-data"})
     public EntityResponseDto.getFrameResponseDto uploadFrame(@ModelAttribute FrameCreateDto frameDto) throws IOException {
 

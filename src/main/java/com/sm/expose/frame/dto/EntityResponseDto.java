@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -23,9 +22,6 @@ public class EntityResponseDto {
         private int status;
         private String message;
         private List<FrameDetailDto> data;
-        private Pageable pageable;
-        private Integer totalPages;
-        private long totalElement;
     }
 
     @Getter

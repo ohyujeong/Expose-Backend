@@ -1,8 +1,10 @@
 package com.sm.expose.frame.service;
 
+import com.sm.expose.frame.domain.Category;
 import com.sm.expose.frame.domain.Frame;
 import com.sm.expose.frame.domain.FrameCategory;
 import com.sm.expose.frame.dto.FrameDetailDto;
+import com.sm.expose.frame.respository.CategoryRepository;
 import com.sm.expose.frame.respository.FrameCategoryRepository;
 import com.sm.expose.frame.respository.FrameRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +12,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -20,16 +24,43 @@ public class FrameService {
 
     private final FrameRepository frameRepository;
     private final FrameCategoryRepository frameCategoryRepository;
+    private final CategoryRepository categoryRepository;
 
     public long saveFrame(Frame frame){
         Frame createFrame = frameRepository.save(frame);
-        System.out.println(createFrame.getFrameId());
         return createFrame.getFrameId();
     }
 
-//    public FrameDetailDto getFramesByCategory(List<String> categories){
-//
-//    }
+    public List<FrameDetailDto> getFramesByCategory(String categoryQuery){
+
+        //들어온 쿼리 카테고리 리스트로 만듦
+        List <String> categories = Arrays.asList(categoryQuery.split(","));
+
+        List<Long> frameIdList = new ArrayList<>();
+        List<FrameDetailDto> result = new ArrayList<>();
+
+        for(int i=0; i<categories.size(); i++){
+
+            //findByName으로 카테고리 객체 받아오기
+            Category category = categoryRepository.findByCategoryName(categories.get(i));
+            List<FrameCategory> frameCategories = frameCategoryRepository.findByCategoryId(category.getCategoryId());
+
+            for(int j =0; j<frameCategories.size(); j++){
+                frameIdList.add(frameCategories.get(j).getFrame().getFrameId());
+            }
+        }
+
+        List<Long> removeDuplicateFrame = frameIdList.stream().distinct().collect(Collectors.toList());
+
+        for(int i=0; i<removeDuplicateFrame.size(); i++){
+            Optional<Frame> frame = frameRepository.findById(removeDuplicateFrame.get(i));
+            FrameDetailDto frameDetailDto = FrameDetailDto.from(frame.get());
+            frameDetailDto.setCategories(this.getCategory(frame.get()));
+            result.add(frameDetailDto);
+        }
+        return result;
+    }
+
 
     public FrameDetailDto getOneFrame(Frame frame) {
         FrameDetailDto frameDetailDto = FrameDetailDto.from(frame);
