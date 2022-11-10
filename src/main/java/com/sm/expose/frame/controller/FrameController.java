@@ -28,7 +28,7 @@ public class FrameController {
     private final CategoryService categoryService;
 
     @ApiOperation(value = "프레임 카테고리별 조회", notes = "프레임 카테고리별 조회 엔드 포인트")
-    @ApiImplicitParam(name="category", value = "category1,category2")
+    @ApiImplicitParam(name="category", value = "half,wholeStand")
     @GetMapping()
     public EntityResponseDto.getFrameAllResponseDto getStudies(
             @RequestParam(name="category", required = false) String category) {

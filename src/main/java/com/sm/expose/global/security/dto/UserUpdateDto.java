@@ -13,18 +13,18 @@ import lombok.Setter;
 public class UserUpdateDto {
 
     @ApiModelProperty(value = "1")
-    private Integer whole;
+    private Integer wholeStand;
 
     @ApiModelProperty(value = "2")
-    private Integer stand;
+    private Integer wholeSit;
 
     @ApiModelProperty(value = "0")
     private Integer half;
 
     @ApiModelProperty(value = "3")
-    private Integer sit;
+    private Integer longHalf;
 
     @ApiModelProperty(value = "4")
-    private Integer self;
+    private Integer selfie;
 
 }

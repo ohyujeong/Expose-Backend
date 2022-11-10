@@ -18,7 +18,7 @@ import java.util.List;
 @ApiModel
 public class FrameCreateDto {
 
-    @ApiModelProperty(value="프레임 카테고리", required = true, dataType = "List")
+    @ApiModelProperty(value="프레임 카테고리", example = "wholeStand", required = true, dataType = "List")
     private List<String> categories = new ArrayList<>();
 
     @ApiModelProperty(value="프레임 파일 ", required = false)

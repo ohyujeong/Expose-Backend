@@ -33,15 +33,15 @@ public class User {
     private String profileImage;
 
     @Column
-    private Integer whole;
+    private Integer wholeStand;
     @Column
-    private Integer stand;
+    private Integer wholeSit;
     @Column
     private Integer half;
     @Column
-    private Integer self;
+    private Integer selfie;
     @Column
-    private Integer sit;
+    private Integer longHalf;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -76,11 +76,11 @@ public class User {
     }
 
     public User updateTaste(UserUpdateDto dto){
-        this.whole = dto.getWhole();
-        this.stand = dto.getStand();
+        this.wholeStand = dto.getWholeStand();
+        this.wholeSit = dto.getWholeSit();
         this.half = dto.getHalf();
-        this.self = dto.getSelf();
-        this.sit = dto.getSit();
+        this.selfie = dto.getSelfie();
+        this.longHalf = dto.getLongHalf();
         return this;
     }
 }
