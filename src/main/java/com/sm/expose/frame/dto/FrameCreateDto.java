@@ -18,22 +18,11 @@ import java.util.List;
 @ApiModel
 public class FrameCreateDto {
 
-//    @ApiModelProperty(value = "프레임 이름")
-//    private String frameName;
-
     @ApiModelProperty(value="프레임 카테고리", required = true, dataType = "List")
     private List<String> categories = new ArrayList<>();
 
     @ApiModelProperty(value="프레임 파일 ", required = false)
     private MultipartFile multipartFile;
-
-
-//    //DTO를 Entity로 변환해주기 위한 메소드
-//    public Frame toEntity(){
-//        return Frame.builder()
-//                .frameName(frameName)
-//                .build();
-//    }
 
     @Getter
     @AllArgsConstructor

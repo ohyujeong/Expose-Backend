@@ -16,7 +16,7 @@ public class FrameDetailDto {
     @ApiModelProperty(value= "프레임 id")
     private Long frameId;
 
-    @ApiModelProperty(value = "프레임 이름", example = "전신 1")
+    @ApiModelProperty(value = "프레임 이름")
     private String frameName;
 
     @ApiModelProperty(value = "프레임 이미지 경로")
@@ -25,7 +25,7 @@ public class FrameDetailDto {
     @ApiModelProperty(value = "S3에 저장된 프레임 이름")
     private String s3FrameName;
 
-    @ApiModelProperty(value = "프레임 카테고리", example = "[전신, 앉음]")
+    @ApiModelProperty(value = "프레임 카테고리", example = "[whole, stand]")
     private List<String> categories;
 
 

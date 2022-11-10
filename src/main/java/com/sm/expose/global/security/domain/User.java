@@ -1,5 +1,6 @@
 package com.sm.expose.global.security.domain;
 
+import com.sm.expose.global.security.dto.UserUpdateDto;
 import com.sm.expose.global.security.oauth.ProviderType;
 import lombok.*;
 
@@ -32,6 +33,17 @@ public class User {
     private String profileImage;
 
     @Column
+    private Integer whole;
+    @Column
+    private Integer stand;
+    @Column
+    private Integer half;
+    @Column
+    private Integer self;
+    @Column
+    private Integer sit;
+
+    @Column
     @Enumerated(EnumType.STRING)
     private ProviderType providerType;
 
@@ -39,6 +51,14 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+//    @PrePersist
+//    public void prePersist(){
+//        this.whole = this.whole == null ? 0 : this.whole;
+//        this.stand = this.stand == null ? 0 : this.stand;
+//        this.half = this.half == null ? 0 : this.half;
+//        this.self = this.self == null ? 0 : this.self;
+//        this.sit = this.sit == null ? 0 : this.sit;
+//    }
 
     @Builder
     public User(String email, String nickname, String password, String profileImage, Role role) {
@@ -52,6 +72,15 @@ public class User {
     public User update(String nickname, String profileImage) {
         this.nickname = nickname;
         this.profileImage = profileImage;
+        return this;
+    }
+
+    public User updateTaste(UserUpdateDto dto){
+        this.whole = dto.getWhole();
+        this.stand = dto.getStand();
+        this.half = dto.getHalf();
+        this.self = dto.getSelf();
+        this.sit = dto.getSit();
         return this;
     }
 }

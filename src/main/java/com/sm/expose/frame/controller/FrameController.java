@@ -8,6 +8,7 @@ import com.sm.expose.frame.dto.FrameUploadDto;
 import com.sm.expose.frame.service.AwsS3Service;
 import com.sm.expose.frame.service.CategoryService;
 import com.sm.expose.frame.service.FrameService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
+@Api(tags={"프레임 API"})
 @RestController
 @RequestMapping("/frame")
 @RequiredArgsConstructor

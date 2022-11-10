@@ -7,6 +7,7 @@ import com.sm.expose.global.security.domain.UserPrincipal;
 import com.sm.expose.global.security.dto.AuthResponse;
 import com.sm.expose.global.security.dto.AuthorizationKakao;
 import com.sm.expose.global.security.dto.KakaoOAuth2User;
+import com.sm.expose.global.security.dto.UserUpdateDto;
 import com.sm.expose.global.security.oauth.ProviderType;
 import com.sm.expose.global.security.provider.TokenProvider;
 import com.sm.expose.global.security.repository.UserRepository;
@@ -52,6 +53,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public User updateUser(User user, KakaoOAuth2User kakaoOAuth2User){
         return userRepository.save(user.update(kakaoOAuth2User.getName(), kakaoOAuth2User.getProfileImage()));
+    }
+
+    public void updateUserTaste(User user, UserUpdateDto userUpdateDto){
+        user.updateTaste(userUpdateDto);
+        userRepository.save(user);
     }
 
     // loadUserByUsername 은 DB에 접근해서 사용자 정보를 가져오는 역할을 함
