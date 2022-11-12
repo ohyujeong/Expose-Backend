@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.security.Principal;
 
@@ -25,7 +26,7 @@ public class AuthController {
     private final UserDetailsServiceImpl userDetailsService;
 
     @GetMapping("/user/me")
-    public User getCurrentUser(Principal principal) {
+    public User getCurrentUser(@ApiIgnore Principal principal) {
         try{
             User user = userRepository.findByEmail(principal.getName());
             return user;
@@ -36,7 +37,7 @@ public class AuthController {
 
     @ApiOperation(value = "사용자 취향 업데이트", notes = "사용자 취향 업데이트 엔드포인트")
     @PatchMapping("/user/update")
-    public ResponseEntity<ResponseMessage> updateUserInfo(@RequestBody UserUpdateDto userUpdateDto, Principal principal) {
+    public ResponseEntity<ResponseMessage> updateUserInfo(@RequestBody UserUpdateDto userUpdateDto, @ApiIgnore Principal principal) {
         User user = userRepository.findByEmail(principal.getName());
         userDetailsService.updateUserTaste(user, userUpdateDto);
         return new ResponseEntity<>(ResponseMessage.withData(201, "취향 업데이트 성공", user), HttpStatus.CREATED);
