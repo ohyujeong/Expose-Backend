@@ -23,6 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.security.Principal;
 
 @Service
 @Transactional
@@ -42,6 +43,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.tokenProvider = tokenProvider;
     }
 
+    public User findUser(Principal principal){
+        User user = userRepository.findByEmail(principal.getName());
+        return user;
+    }
 
     public User findByEmail(String email){
         return userRepository.findByEmail(email); //없으면 null, 있으면 user 객체 return

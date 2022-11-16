@@ -5,7 +5,6 @@ import com.sm.expose.global.common.ResponseMessage;
 import com.sm.expose.global.security.domain.User;
 import com.sm.expose.global.security.dto.AuthResponse;
 import com.sm.expose.global.security.dto.UserUpdateDto;
-import com.sm.expose.global.security.repository.UserRepository;
 import com.sm.expose.global.security.service.UserDetailsServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,13 +21,12 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserRepository userRepository;
     private final UserDetailsServiceImpl userDetailsService;
 
     @GetMapping("/user/me")
     public User getCurrentUser(@ApiIgnore Principal principal) {
         try{
-            User user = userRepository.findByEmail(principal.getName());
+            User user = userDetailsService.findUser(principal);
             return user;
         }catch (NullPointerException e){
             throw e;
@@ -38,7 +36,7 @@ public class AuthController {
     @ApiOperation(value = "사용자 취향 업데이트", notes = "사용자 취향 업데이트 엔드포인트")
     @PatchMapping("/user/update")
     public ResponseEntity<ResponseMessage> updateUserInfo(@RequestBody UserUpdateDto userUpdateDto, @ApiIgnore Principal principal) {
-        User user = userRepository.findByEmail(principal.getName());
+        User user =  userDetailsService.findUser(principal);
         userDetailsService.updateUserTaste(user, userUpdateDto);
         return new ResponseEntity<>(ResponseMessage.withData(201, "취향 업데이트 성공", user), HttpStatus.CREATED);
     }

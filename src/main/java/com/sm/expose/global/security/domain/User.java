@@ -33,15 +33,13 @@ public class User {
     private String profileImage;
 
     @Column
-    private Integer wholeStand;
+    private Integer whole;
     @Column
-    private Integer wholeSit;
+    private Integer sit;
     @Column
     private Integer half;
     @Column
     private Integer selfie;
-    @Column
-    private Integer longHalf;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -51,14 +49,14 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-//    @PrePersist
-//    public void prePersist(){
-//        this.whole = this.whole == null ? 0 : this.whole;
-//        this.stand = this.stand == null ? 0 : this.stand;
-//        this.half = this.half == null ? 0 : this.half;
-//        this.self = this.self == null ? 0 : this.self;
-//        this.sit = this.sit == null ? 0 : this.sit;
-//    }
+    @PrePersist
+    public void prePersist(){
+        System.out.println("prepersist working");
+        this.whole = this.whole == null ? 0 : this.whole;
+        this.half = this.half == null ? 0 : this.half;
+        this.selfie = this.selfie == null ? 0 : this.selfie;
+        this.sit = this.sit == null ? 0 : this.sit;
+    }
 
     @Builder
     public User(String email, String nickname, String password, String profileImage, Role role) {
@@ -76,11 +74,10 @@ public class User {
     }
 
     public User updateTaste(UserUpdateDto dto){
-        this.wholeStand = dto.getWholeStand();
-        this.wholeSit = dto.getWholeSit();
+        this.whole = dto.getWhole();
+        this.sit = dto.getSit();
         this.half = dto.getHalf();
         this.selfie = dto.getSelfie();
-        this.longHalf = dto.getLongHalf();
         return this;
     }
 }

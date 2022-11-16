@@ -34,6 +34,14 @@ public class EntityResponseDto {
 
     @Getter
     @AllArgsConstructor
+    public static class getCategoryResponseDto{
+        private int status;
+        private String message;
+        private CategoryDto data;
+    }
+
+    @Getter
+    @AllArgsConstructor
     public static class messageResponse{
         private int status;
         private String message;
