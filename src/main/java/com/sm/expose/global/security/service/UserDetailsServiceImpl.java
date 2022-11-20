@@ -61,6 +61,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public void updateUserTaste(User user, UserUpdateDto userUpdateDto){
+        if(userUpdateDto.getHalf() == null) {
+            userUpdateDto.setHalf(user.getHalf());
+        }
+        if(userUpdateDto.getSelfie() == null) {
+            userUpdateDto.setSelfie(user.getSelfie());
+        }
+        if(userUpdateDto.getSit() == null) {
+            userUpdateDto.setSit(user.getSit());
+        }
+        if(userUpdateDto.getWhole() == null) {
+            userUpdateDto.setWhole(user.getWhole());
+        }
         user.updateTaste(userUpdateDto);
         userRepository.save(user);
     }

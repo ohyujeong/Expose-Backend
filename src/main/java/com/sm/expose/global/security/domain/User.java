@@ -1,5 +1,6 @@
 package com.sm.expose.global.security.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sm.expose.frame.domain.FrameUser;
 import com.sm.expose.global.security.dto.UserUpdateDto;
 import com.sm.expose.global.security.oauth.ProviderType;
@@ -52,6 +53,7 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<FrameUser> frames = new ArrayList<>();
 

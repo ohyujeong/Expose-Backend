@@ -6,6 +6,8 @@ import com.sm.expose.frame.domain.QFrameUser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @AllArgsConstructor
 public class FrameUserRepositoryImpl implements FrameUserRepositoryCustom{
@@ -17,5 +19,12 @@ public class FrameUserRepositoryImpl implements FrameUserRepositoryCustom{
         return (FrameUser) queryFactory.from(QFrameUser.frameUser)
                 .where(QFrameUser.frameUser.frame.frameId.eq(frameId).and(QFrameUser.frameUser.user.userId.eq(userId)))
                 .fetchOne();
+    }
+
+    @Override
+    public List<FrameUser> findByUser(Long userId) {
+        return (List<FrameUser>) queryFactory.from(QFrameUser.frameUser)
+                .where(QFrameUser.frameUser.user.userId.eq(userId))
+                .fetch();
     }
 }

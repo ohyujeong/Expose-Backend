@@ -105,14 +105,15 @@ public class FrameController {
         return new EntityResponseDto.getFrameAllResponseDto(200, "추천 프레임 조회 성공", responseData);
     }
 
-    @ApiOperation(value = "프레임 사용 여부 업데이트",
-            notes = "사용자가 조회했던 프레임을 사용하면 사용여부를 true로 바꿔준다.(추천 갱신에 사용)")
+    @ApiOperation(value = "프레임 사용 횟수, 유저 취향 카테고리 업데이트",
+            notes = "사용자가 프레임을 사용하면 사용횟수와 유저 취향 카테고리를 업데이트 한다.(추천 갱신에 사용)")
     @PatchMapping("/use")
     public EntityResponseDto.messageResponse updateUserFrameStatus(@ApiIgnore Principal principal, @RequestParam(name="frameId") long frameId) {
 
-        frameService.updateFrameUser(frameId, principal);
+        User user = userDetailsService.findUser(principal);
+        frameService.updateFrameUser(frameId, user);
 
-        return new EntityResponseDto.messageResponse(200, "프레임 사용여부 업데이트 성공");
+        return new EntityResponseDto.messageResponse(200, "프레임 사용 횟수, 유저취향 업데이트 성공");
     }
 }
 

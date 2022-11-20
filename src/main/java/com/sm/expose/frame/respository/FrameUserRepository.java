@@ -6,6 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FrameUserRepository extends JpaRepository<FrameUser, Long>, FrameUserRepositoryCustom {
-//    List<FrameUser> findByUser(User user);
-//    List<FrameUser> findByFrame(Frame frame);
 }

@@ -10,12 +10,12 @@ import com.sm.expose.frame.respository.FrameCategoryRepository;
 import com.sm.expose.frame.respository.FrameRepository;
 import com.sm.expose.frame.respository.FrameUserRepository;
 import com.sm.expose.global.security.domain.User;
+import com.sm.expose.global.security.dto.UserUpdateDto;
 import com.sm.expose.global.security.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -96,9 +96,7 @@ public class FrameService {
         String mostCategory = categories.get(0);
         String mostCategory2 = categories.get(1);
 
-
         //3개의 추천 포즈 보여 주기 제일 많이 나온 카테고리 + 그 다음 카테고리를 2:1 비율로
-
         List<Long> frameIdList = new ArrayList<>();
 
         //랜덤 추출 중복 제거용
@@ -112,12 +110,10 @@ public class FrameService {
 
         List<Long> mostFrameIds = new ArrayList<>();
 
-
         //mostCategory에 속한 프레임들의 ID를 넣어줌
         for (FrameCategory frameCategory : frameCategories) {
             mostFrameIds.add(frameCategory.getFrame().getFrameId());
         }
-
 
         Random random = new Random();
 
@@ -167,7 +163,6 @@ public class FrameService {
         return result;
     }
 
-
     public FrameDetailDto getOneFrame(long frameId) {
         Frame frame = frameRepository.getById(frameId);
         FrameDetailDto frameDetailDto = FrameDetailDto.from(frame);
@@ -175,15 +170,15 @@ public class FrameService {
         return frameDetailDto;
     }
 
-    public void updateFrameUser(long frameId, Principal principal) {
+    public void updateFrameUser(long frameId, User user) {
 
-        User user = userDetailsService.findUser(principal);
         Long userId = user.getUserId();
 
         Frame frame = frameRepository.getById(frameId);
 
         FrameUser existFrameUser = frameUserRepository.findByFrameUser(frameId, userId);
 
+        //한 번도 사용하지 않았던 프레임 일 때 새로 저장
         if(existFrameUser == null){
             FrameUser frameUser = new FrameUser();
             frameUser.setFrame(frame);
@@ -197,10 +192,38 @@ public class FrameService {
             Integer useCount = updateFrameUser.getUseCount()+1;
             updateFrameUser.setUseCount(useCount);
         }
+        //사용 했던 프레임 일 때
         else{
             Integer useCount = existFrameUser.getUseCount()+1;
             existFrameUser.setUseCount(useCount);
         }
+        //사용자 취향 업데이트
+        //프레임 카테고리 가져오기
+        List<String> categories = this.getCategory(frame);
+        UserUpdateDto userUpdateDto = new UserUpdateDto();
+
+        for(String category : categories){
+            switch(category) {
+                case "half":
+                    Integer half = user.getHalf() + 1;
+                    userUpdateDto.setHalf(half);
+                    break;
+                case "whole" :
+                    Integer whole = user.getWhole()+1;
+                    userUpdateDto.setWhole(whole);
+                    break;
+                case "sit":
+                    Integer sit = user.getSit()+1;
+                    userUpdateDto.setSit(sit);
+                    break;
+                case "selfie":
+                    Integer selfie = user.getSelfie()+1;
+                    userUpdateDto.setSelfie(selfie);
+                    break;
+            }
+        }
+
+        userDetailsService.updateUserTaste(user, userUpdateDto);
 
 //        FrameDetailDto frameDetailDto = FrameDetailDto.from(frame);
 //        frameDetailDto.setCategories(this.getCategory(frame));
@@ -212,8 +235,8 @@ public class FrameService {
         List<String> categories = new ArrayList<>();
         List<FrameCategory> frameCategories = frameCategoryRepository.findByFrame(frame.get());
 
-        for(int i=0;i<frameCategories .size();i++)
-            categories.add(frameCategories.get(i).getCategory().getCategoryName());
+        for (FrameCategory frameCategory : frameCategories)
+            categories.add(frameCategory.getCategory().getCategoryName());
 
         return categories;
     }
