@@ -22,7 +22,7 @@ public class Category {
     private String categoryName;
 
     @OneToMany(mappedBy = "category")
-    private List<FrameCategory> studies = new ArrayList<>();
+    private List<FrameCategory> frames = new ArrayList<>();
 
     @Builder
     public Category(String categoryName){

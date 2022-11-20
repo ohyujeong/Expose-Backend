@@ -3,14 +3,19 @@ package com.sm.expose.frame.service;
 import com.sm.expose.frame.domain.Category;
 import com.sm.expose.frame.domain.Frame;
 import com.sm.expose.frame.domain.FrameCategory;
+import com.sm.expose.frame.domain.FrameUser;
 import com.sm.expose.frame.dto.FrameDetailDto;
 import com.sm.expose.frame.respository.CategoryRepository;
 import com.sm.expose.frame.respository.FrameCategoryRepository;
 import com.sm.expose.frame.respository.FrameRepository;
+import com.sm.expose.frame.respository.FrameUserRepository;
+import com.sm.expose.global.security.domain.User;
+import com.sm.expose.global.security.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,6 +27,8 @@ public class FrameService {
     private final FrameRepository frameRepository;
     private final FrameCategoryRepository frameCategoryRepository;
     private final CategoryRepository categoryRepository;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final FrameUserRepository frameUserRepository;
 
     public long saveFrame(Frame frame){
         Frame createFrame = frameRepository.save(frame);
@@ -140,7 +147,6 @@ public class FrameService {
         for(int i=0; i<1; i++){
             int randomIndex = random.nextInt(mostFrameIds2.size());
             int frameIndex = mostFrameIds2.get(randomIndex).intValue();
-//            System.out.println("frameIndex : " + frameIndex);
             if(!bool[frameIndex]){
                 Long frameId = (long) frameIndex;
                 frameIdList.add(frameId);
@@ -150,8 +156,6 @@ public class FrameService {
                 i -=1;
             }
         }
-
-        System.out.println(frameIdList);
 
         for(int i=0; i<frameIdList.size(); i++){
             Optional<Frame> frame = frameRepository.findById(frameIdList.get(i));
@@ -164,10 +168,43 @@ public class FrameService {
     }
 
 
-    public FrameDetailDto getOneFrame(Frame frame) {
+    public FrameDetailDto getOneFrame(long frameId) {
+        Frame frame = frameRepository.getById(frameId);
         FrameDetailDto frameDetailDto = FrameDetailDto.from(frame);
         frameDetailDto.setCategories(this.getCategory(frame));
         return frameDetailDto;
+    }
+
+    public void updateFrameUser(long frameId, Principal principal) {
+
+        User user = userDetailsService.findUser(principal);
+        Long userId = user.getUserId();
+
+        Frame frame = frameRepository.getById(frameId);
+
+        FrameUser existFrameUser = frameUserRepository.findByFrameUser(frameId, userId);
+
+        if(existFrameUser == null){
+            FrameUser frameUser = new FrameUser();
+            frameUser.setFrame(frame);
+            frameUser.setUser(user);
+
+            frameUserRepository.save(frameUser);
+
+            //저장 후 사용 횟수 업데이트
+            FrameUser updateFrameUser = frameUserRepository.findByFrameUser(frameId, userId);
+
+            Integer useCount = updateFrameUser.getUseCount()+1;
+            updateFrameUser.setUseCount(useCount);
+        }
+        else{
+            Integer useCount = existFrameUser.getUseCount()+1;
+            existFrameUser.setUseCount(useCount);
+        }
+
+//        FrameDetailDto frameDetailDto = FrameDetailDto.from(frame);
+//        frameDetailDto.setCategories(this.getCategory(frame));
+
     }
 
     public List<String> getCategory(Frame categoryFrame){
@@ -180,4 +217,15 @@ public class FrameService {
 
         return categories;
     }
+
+//    public List<String> getUsers(Frame categoryFrame){
+//        Optional<Frame> frame = frameRepository.findById(categoryFrame.getFrameId());
+//        List<String> categories = new ArrayList<>();
+//        List<FrameCategory> frameCategories = frameCategoryRepository.findByFrame(frame.get());
+//
+//        for(int i=0;i<frameCategories .size();i++)
+//            categories.add(frameCategories.get(i).getCategory().getCategoryName());
+//
+//        return categories;
+//    }
 }

@@ -1,10 +1,13 @@
 package com.sm.expose.global.security.domain;
 
+import com.sm.expose.frame.domain.FrameUser;
 import com.sm.expose.global.security.dto.UserUpdateDto;
 import com.sm.expose.global.security.oauth.ProviderType;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -49,9 +52,11 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @OneToMany(mappedBy = "user")
+    private List<FrameUser> frames = new ArrayList<>();
+
     @PrePersist
     public void prePersist(){
-        System.out.println("prepersist working");
         this.whole = this.whole == null ? 0 : this.whole;
         this.half = this.half == null ? 0 : this.half;
         this.selfie = this.selfie == null ? 0 : this.selfie;

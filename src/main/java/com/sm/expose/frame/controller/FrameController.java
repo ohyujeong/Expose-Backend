@@ -43,6 +43,24 @@ public class FrameController {
         return new EntityResponseDto.getFrameAllResponseDto(200, "프레임 조회 성공", responseData);
     }
 
+    @ApiOperation(value = "프레임 상세 조회", notes = "프레임 하나를 선택 해서 가져 온다.")
+    @GetMapping("/{frameId}")
+    public EntityResponseDto.getFrameResponseDto getFrameOne(@RequestParam(name="frameId") long frameId, @ApiIgnore Principal principal) {
+
+
+        FrameDetailDto responseData = frameService.getOneFrame(frameId);
+
+//        //비회원 유저일 때
+//        if(principal == null){
+//            responseData = frameService.getOneFrame(frameId);
+//        }
+//        //회원 유저가 프레임 조회 했을 때 (!=사용) FrameUser에 사용자가 선택한 프레임 저장 (사용여부는 아직 false)
+//        else{
+//            responseData = frameService.getOneFrameUser(frameId, principal);
+//        }
+        return new EntityResponseDto.getFrameResponseDto(200, "프레임 조회 성공", responseData);
+    }
+
     @ApiOperation(value = "프레임 업로드", notes = "프레임 업로드 엔드포인트")
     @PostMapping(consumes = {"multipart/form-data"})
     public EntityResponseDto.getFrameResponseDto uploadFrame(@ModelAttribute FrameCreateDto frameDto) throws IOException {
@@ -60,7 +78,7 @@ public class FrameController {
             categoryService.saveCategory(categories, frame);
         }
 
-        FrameDetailDto frameDetailDto = frameService.getOneFrame(frame);
+        FrameDetailDto frameDetailDto = frameService.getOneFrame(frame.getFrameId());
         return new EntityResponseDto.getFrameResponseDto(201, "프레임 등록", frameDetailDto);
     }
 
@@ -85,6 +103,16 @@ public class FrameController {
         List<FrameDetailDto> responseData = frameService.getRecommendFrame(sortCategories);
 
         return new EntityResponseDto.getFrameAllResponseDto(200, "추천 프레임 조회 성공", responseData);
+    }
+
+    @ApiOperation(value = "프레임 사용 여부 업데이트",
+            notes = "사용자가 조회했던 프레임을 사용하면 사용여부를 true로 바꿔준다.(추천 갱신에 사용)")
+    @PatchMapping("/use")
+    public EntityResponseDto.messageResponse updateUserFrameStatus(@ApiIgnore Principal principal, @RequestParam(name="frameId") long frameId) {
+
+        frameService.updateFrameUser(frameId, principal);
+
+        return new EntityResponseDto.messageResponse(200, "프레임 사용여부 업데이트 성공");
     }
 }
 

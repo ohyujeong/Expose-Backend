@@ -30,6 +30,10 @@ public class Frame {
     @Column(name = "categories")
     private List<FrameCategory> categories = new ArrayList<>();
 
+    @OneToMany(mappedBy = "frame", cascade = CascadeType.ALL)
+    @Column(name = "users")
+    private List<FrameUser> users = new ArrayList<>();
+
     @Builder
     public Frame(String frameName, String framePath, String s3FrameName) {
         this.frameName = frameName;
