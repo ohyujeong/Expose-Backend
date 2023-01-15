@@ -7,6 +7,5 @@ import java.util.List;
 
 public interface FrameUserRepositoryCustom {
     FrameUser findByFrameUser(Long frameId, Long userId);
-    List<FrameUser> findByUser(Long userId);
-
+    List<FrameUser> findByFrame(Long frameId);
 }

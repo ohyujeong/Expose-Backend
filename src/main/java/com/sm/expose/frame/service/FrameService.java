@@ -33,6 +33,7 @@ public class FrameService {
     public long saveFrame(Frame frame){
         Frame createFrame = frameRepository.save(frame);
         return createFrame.getFrameId();
+
     }
 
     public List<FrameDetailDto> getFramesByCategory(String categoryQuery){
@@ -91,26 +92,35 @@ public class FrameService {
         List<String> categories = new ArrayList<>();
         List<FrameDetailDto> result = new ArrayList<>();
 
-        //제일 많이 나온 카테고리부터 찾아서 리스트에 넣어주기
+        //제일 많이 나온 카테고리 2개를 찾아서 리스트에 넣어주기
         for (Map.Entry<String, Integer> en : hm.entrySet()) { categories.add(en.getKey()); }
         String mostCategory = categories.get(0);
         String mostCategory2 = categories.get(1);
 
-        //3개의 추천 포즈 보여 주기 제일 많이 나온 카테고리 + 그 다음 카테고리를 2:1 비율로
+        // 3개의 랜덤 프레임 ID를 추출해서 이 리스트에 넣어줌
+        // 제일 많이 나온 카테고리 + 그 다음 카테고리를 2:1 비율로
         List<Long> frameIdList = new ArrayList<>();
 
-        //랜덤 추출 중복 제거용
+        //일단 존재하는 모든 프레임 다 가져옴
         List<Frame> frames = frameRepository.findAll();
+
+        //frame 추출여부를 true/false로 체크해서 랜덤 추출할 때 중복 제거
         Boolean[] bool = new Boolean[frames.size()+1];
         Arrays.fill(bool,false);
 
-        //mostCategory에 속해 있는 프레임 전체를 가져오기
+        //모든 프레임들의 ID
+        List<Long> allFrameIds = new ArrayList<>();
+        for (Frame value : frames) {
+            allFrameIds.add(value.getFrameId());
+        }
+
+        //mostCategory (이 카테고리에서 프레임 2개 추출) 에 속해 있는 프레임 전체를 가져오기
         Category category = categoryRepository.findByCategoryName(mostCategory);
         List<FrameCategory> frameCategories = frameCategoryRepository.findByCategoryId(category.getCategoryId());
 
         List<Long> mostFrameIds = new ArrayList<>();
 
-        //mostCategory에 속한 프레임들의 ID를 넣어줌
+        //mostCategory에 속한 프레임들의 ID를 mostFrameIds 리스트에 넣어주고 이 리스트에서 랜덤으로 프레임들을 뽑아줌
         for (FrameCategory frameCategory : frameCategories) {
             mostFrameIds.add(frameCategory.getFrame().getFrameId());
         }
@@ -120,17 +130,20 @@ public class FrameService {
         for(int i=0; i<2; i++){
             int randomIndex = random.nextInt(mostFrameIds.size());
             int frameIndex = mostFrameIds.get(randomIndex).intValue();
+
+            //중복 체크를 위해 뽑은 프레임은 true 로 바꿔줌
             if(!bool[frameIndex]){
                 Long frameId = (long) frameIndex;
                 frameIdList.add(frameId);
                 bool[frameIndex] = true;
             }
+            //프레임이 true이고, 아직 2개를 다 안 뽑았으면 중복이 없는 한 개를 더 뽑을 때까지 for 반복
             else if(bool[frameIndex] && frameIdList.size() <2){
                 i -=1;
             }
         }
 
-        // mostCategory2 랜덤 찾기
+        // mostCategory2 랜덤 찾기 - 프레임 1개 추출
         Category category2 = categoryRepository.findByCategoryName(mostCategory2);
         List<FrameCategory> frameCategories2 = frameCategoryRepository.findByCategoryId(category2.getCategoryId());
         List<Long> mostFrameIds2 = new ArrayList<>();
@@ -140,6 +153,7 @@ public class FrameService {
             mostFrameIds2.add(frameCategory.getFrame().getFrameId());
         }
 
+        //앞서 뽑은 mostCategory의 프레임과 겹치지 않게 중복 체크를 해줌
         for(int i=0; i<1; i++){
             int randomIndex = random.nextInt(mostFrameIds2.size());
             int frameIndex = mostFrameIds2.get(randomIndex).intValue();
@@ -153,6 +167,21 @@ public class FrameService {
             }
         }
 
+        for(int i=0; i<1; i++){
+            int randomIndex = random.nextInt(frames.size());
+            int frameIndex = allFrameIds.get(randomIndex).intValue();
+            if(!bool[frameIndex]){
+                Long frameId = (long) frameIndex;
+                frameIdList.add(frameId);
+                bool[frameIndex] = true;
+            }
+            else if(bool[frameIndex] && frameIdList.size() <4){
+                i -=1;
+            }
+        }
+
+        //최종적으로 프레임 3개 + 사용자 취향과 관계없는 랜덤 프레임1개 를 결과로 보내주기 위한 for 문
+        //앞에서 랜덤으로 뽑은 프레임 id 3개를 repo에서 찾아서 dto로 변환하여 result 리스트에 추가해줌
         for(int i=0; i<frameIdList.size(); i++){
             Optional<Frame> frame = frameRepository.findById(frameIdList.get(i));
             FrameDetailDto frameDetailDto = FrameDetailDto.from(frame.get());
@@ -224,10 +253,6 @@ public class FrameService {
         }
 
         userDetailsService.updateUserTaste(user, userUpdateDto);
-
-//        FrameDetailDto frameDetailDto = FrameDetailDto.from(frame);
-//        frameDetailDto.setCategories(this.getCategory(frame));
-
     }
 
     public List<String> getCategory(Frame categoryFrame){
