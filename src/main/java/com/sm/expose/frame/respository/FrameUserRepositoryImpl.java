@@ -27,4 +27,11 @@ public class FrameUserRepositoryImpl implements FrameUserRepositoryCustom{
                 .where(QFrameUser.frameUser.frame.frameId.eq(frameId))
                 .fetch();
     }
+
+    @Override
+    public List<FrameUser> findByFrameUserLike(Long userId){
+        return (List<FrameUser>) queryFactory.from(QFrameUser.frameUser)
+                .where(QFrameUser.frameUser.user.userId.eq(userId).and(QFrameUser.frameUser.likeState.eq(true)))
+                .fetch();
+    }
 }

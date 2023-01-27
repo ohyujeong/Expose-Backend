@@ -255,6 +255,59 @@ public class FrameService {
         userDetailsService.updateUserTaste(user, userUpdateDto);
     }
 
+    public void updateFrameUserLike(long frameId, User user){
+        Long userId = user.getUserId();
+        Frame frame = frameRepository.getById(frameId);
+
+        FrameUser existFrameUser = frameUserRepository.findByFrameUser(frameId, userId);
+
+        //FrameUser 테이블에 없는 한 번도 사용하지 않았던 프레임 일 때 새로 저장
+        if(existFrameUser == null){
+            FrameUser frameUser = new FrameUser();
+            frameUser.setFrame(frame);
+            frameUser.setUser(user);
+
+            frameUserRepository.save(frameUser);
+
+            //저장 후 좋아요 여부 업데이트
+            FrameUser updateFrameLike = frameUserRepository.findByFrameUser(frameId, userId);
+            updateFrameLike.setLikeState(true);
+        }
+        //FrameUser 테이블에 있는 프레임일 때 좋아요 여부만 새로 저장
+        else{
+            existFrameUser.setLikeState(true);
+        }
+    }
+
+    public List<FrameDetailDto> getFrameUserLike(User user){
+
+        Long userId = user.getUserId();
+        List<FrameUser> frameUsers = frameUserRepository.findByFrameUserLike(userId);
+
+        List<Long> frameIdList = new ArrayList<>();
+        List<FrameDetailDto> result = new ArrayList<>();
+
+        for (FrameUser frameUser : frameUsers) {
+            frameIdList.add(frameUser.getFrame().getFrameId());
+        }
+
+        for(int i=0; i<frameIdList.size(); i++){
+            Optional<Frame> frame = frameRepository.findById(frameIdList.get(i));
+            FrameDetailDto frameDetailDto = FrameDetailDto.from(frame.get());
+            frameDetailDto.setCategories(this.getCategory(frame.get()));
+            result.add(frameDetailDto);
+        }
+        return result;
+    }
+
+    public void cancelFrameUserLike(Long frameId, User user){
+
+        Long userId = user.getUserId();
+        FrameUser frameUser = frameUserRepository.findByFrameUser(frameId, userId);
+        frameUser.setLikeState(false);
+
+    }
+
     public List<String> getCategory(Frame categoryFrame){
         Optional<Frame> frame = frameRepository.findById(categoryFrame.getFrameId());
         List<String> categories = new ArrayList<>();

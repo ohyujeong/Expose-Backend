@@ -115,5 +115,35 @@ public class FrameController {
 
         return new EntityResponseDto.messageResponse(200, "프레임 사용 횟수, 유저취향 업데이트 성공");
     }
+
+    @ApiOperation(value = "프레임 좋아요")
+    @PatchMapping("/like")
+    public EntityResponseDto.messageResponse updateFrameUserLike(@ApiIgnore Principal principal, @RequestParam(name="frameId") long frameId) {
+
+        User user = userDetailsService.findUser(principal);
+        frameService.updateFrameUserLike(frameId, user);
+
+        return new EntityResponseDto.messageResponse(200, "프레임 좋아요 성공");
+    }
+
+    @ApiOperation(value = "좋아요한 프레임 조회")
+    @GetMapping("/like")
+    public EntityResponseDto.getFrameAllResponseDto getFrameUserLike(@ApiIgnore Principal principal) {
+
+        User user = userDetailsService.findUser(principal);
+        List<FrameDetailDto> responseData = frameService.getFrameUserLike(user);
+
+        return new EntityResponseDto.getFrameAllResponseDto(200, "좋아요한 프레임 조회 성공", responseData);
+    }
+
+    @ApiOperation(value = "프레임 좋아요 취소")
+    @PatchMapping("/like/cancel")
+    public EntityResponseDto.messageResponse cancelFrameUserLike(@ApiIgnore Principal principal, @RequestParam(name="frameId") long frameId) {
+
+        User user = userDetailsService.findUser(principal);
+        frameService.cancelFrameUserLike(frameId, user);
+
+        return new EntityResponseDto.messageResponse(200, "프레임 좋아요 취소 성공");
+    }
 }
 

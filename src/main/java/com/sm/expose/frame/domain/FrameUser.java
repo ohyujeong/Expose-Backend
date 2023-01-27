@@ -30,10 +30,15 @@ public class FrameUser {
     @Column(name="use_count")
     private Integer useCount;
 
+    //좋아요 여부
+    @Column(name="like_state")
+    private Boolean likeState;
+
 
     @PrePersist
     public void prePersist(){
         this.useCount = this.useCount == null ? 0 : this.useCount;
+        this.likeState = this.likeState != null && this.likeState;
     }
 
 //    //사용 여부
