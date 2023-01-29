@@ -24,4 +24,9 @@ public class UserUpdateDto {
     @ApiModelProperty(value = "4")
     private Integer selfie;
 
+    @ApiModelProperty(value = "1")
+    private Integer two;
+
+    @ApiModelProperty(value = "3")
+    private Integer many;
 }

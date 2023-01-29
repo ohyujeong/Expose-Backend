@@ -87,7 +87,80 @@ public class FrameService {
         return temp;
     }
 
-    public List<FrameDetailDto> getRecommendFrame(Map<String, Integer> hm){
+//    public FrameDetailDto getCollaborationFilter(User user){
+//
+//        Long userId = user.getUserId();
+//
+//        //사용자가 사용했던 프레임들
+//        List<FrameUser> useFrames = frameUserRepository.findByUser(userId);
+//
+//        List<Long> useFrameIds = new ArrayList<>();
+//
+//        //사용했던 프레임 아이디들 저장
+//        for(int i=0; i<useFrames.size(); i++){
+//            useFrameIds.add(useFrames.get(i).getFrame().getFrameId());
+//        }
+//        List<Long> others = new ArrayList<>();
+//        List<FrameUser> otherUsers = new ArrayList<>();
+//
+//        for(int i=0; i< useFrameIds.size(); i++){
+//            //사용자와 같은 프레임을 사용했던 유저들을 불러옴
+//            otherUsers.add((FrameUser) frameUserRepository.findByOtherUser(useFrameIds.get(i), userId));
+//        }
+//
+//        //유저들의 아이디 저장
+//        for(int i=0; i<otherUsers.size(); i++){
+//            others.add(otherUsers.get(i).getUser().getUserId());
+//        }
+//
+//        //유저 아이디 중복 제거
+//        List<Long> removeDuplicateUser = others.stream().distinct().collect(Collectors.toList());
+//
+//        for(int i=0; i<removeDuplicateUser.size(); i++){
+//            List<FrameUser> otherUserUses = frameUserRepository.findByUser()
+//        }
+//
+//        //존재하는 모든 프레임 다 가져옴
+//        List<Frame> frames = frameRepository.findAll();
+//
+//        //모든 프레임들의 ID
+//        List<Long> allFrameIds = new ArrayList<>();
+//
+//        for (Frame value : frames) {
+//            allFrameIds.add(value.getFrameId());
+//        }
+//
+//        //frame 추출여부를 true/false로 체크해서 랜덤 추출할 때 중복 제거
+//        Boolean[] bool = new Boolean[frames.size()+1];
+//        Arrays.fill(bool,false);
+//
+//        //이미 사용했던 프레임들에는 true 표시
+//        for(int i=0; i<useFrameIds.size(); i++){
+//            int frameIndex = useFrameIds.get(i).intValue();
+//            bool[frameIndex] = true;
+//        }
+//
+//        Random random = new Random();
+//
+//        for(int i=0; i<1; i++){
+//
+//            int randomIndex = random.nextInt(frames.size());
+//            int frameIndex = allFrameIds.get(randomIndex).intValue();
+//
+//            if(!bool[frameIndex]){
+//                Long frameId = (long) frameIndex;
+//                Frame frame = frameRepository.getById(frameId);
+//                return FrameDetailDto.from(frame);
+//            }
+//            else if(bool[frameIndex]){
+//                i -=1;
+//            }
+//        }
+//
+//
+//    }
+
+    public List<FrameDetailDto> getContentBasedFrame(Map<String, Integer> hm){
 
         List<String> categories = new ArrayList<>();
         List<FrameDetailDto> result = new ArrayList<>();
@@ -97,8 +170,8 @@ public class FrameService {
         String mostCategory = categories.get(0);
         String mostCategory2 = categories.get(1);
 
-        // 3개의 랜덤 프레임 ID를 추출해서 이 리스트에 넣어줌
-        // 제일 많이 나온 카테고리 + 그 다음 카테고리를 2:1 비율로
+        // 4개의 랜덤 프레임 ID를 추출해서 이 리스트에 넣어줌
+        // 제일 많이 나온 카테고리 + 그 다음 카테고리를 2:1 비율 + 랜덤 1개
         List<Long> frameIdList = new ArrayList<>();
 
         //일단 존재하는 모든 프레임 다 가져옴
@@ -167,6 +240,8 @@ public class FrameService {
             }
         }
 
+
+        //사용자 취향과 관계없는 프레임 랜덤으로 1개 뽑음
         for(int i=0; i<1; i++){
             int randomIndex = random.nextInt(frames.size());
             int frameIndex = allFrameIds.get(randomIndex).intValue();

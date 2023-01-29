@@ -83,7 +83,7 @@ public class FrameController {
     }
 
     @ApiOperation(value = "추천 프레임 조회",
-            notes = "총 카테고리 4개(whole, half, selfie, sit) 중 사용자가 가장 많이 선택한 " +
+            notes = "총 카테고리 6개(whole, half, selfie, sit, two, many) 중 사용자가 가장 많이 선택한 " +
                     "카테고리 2개를 기준으로 2:1의 비율로 3개의 포즈를 추천해줌")
     @GetMapping("/recommend")
     public EntityResponseDto.getFrameAllResponseDto getRecommendFrame(@ApiIgnore Principal principal, @ApiIgnore Pageable pageable) {
@@ -95,12 +95,15 @@ public class FrameController {
         categories.put("Half", user.getHalf());
         categories.put("Selfie", user.getSelfie());
         categories.put("Sit", user.getSit());
+        categories.put("Two", user.getTwo());
+        categories.put("Many", user.getMany());
 
         //제일 선호하는 순으로 정렬
         Map<String, Integer> sortCategories = frameService.sortByValue(categories);
 
         //정렬한 카테고리 기준으로 프레임 찾아주기
-        List<FrameDetailDto> responseData = frameService.getRecommendFrame(sortCategories);
+        List<FrameDetailDto> responseData = frameService.getContentBasedFrame(sortCategories);
+//        FrameDetailDto test = frameService.getCollaborationFilter(user);
 
         return new EntityResponseDto.getFrameAllResponseDto(200, "추천 프레임 조회 성공", responseData);
     }

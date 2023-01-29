@@ -73,6 +73,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if(userUpdateDto.getWhole() == null) {
             userUpdateDto.setWhole(user.getWhole());
         }
+        if(userUpdateDto.getTwo() == null) {
+            userUpdateDto.setTwo(user.getTwo());
+        }
+        if(userUpdateDto.getMany() == null) {
+            userUpdateDto.setMany(user.getMany());
+        }
         user.updateTaste(userUpdateDto);
         userRepository.save(user);
     }

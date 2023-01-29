@@ -25,7 +25,7 @@ public class FrameDetailDto {
     @ApiModelProperty(value = "S3에 저장된 프레임 이름")
     private String s3FrameName;
 
-    @ApiModelProperty(value = "프레임 카테고리", example = "[wholeStand, longHalf]")
+    @ApiModelProperty(value = "프레임 카테고리", example = "[whole, half]")
     private List<String> categories;
 
 

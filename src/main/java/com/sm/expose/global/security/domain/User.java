@@ -44,6 +44,10 @@ public class User {
     private Integer half;
     @Column
     private Integer selfie;
+    @Column
+    private Integer two;
+    @Column
+    private Integer many;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -63,6 +67,8 @@ public class User {
         this.half = this.half == null ? 0 : this.half;
         this.selfie = this.selfie == null ? 0 : this.selfie;
         this.sit = this.sit == null ? 0 : this.sit;
+        this.two = this.two == null ? 0 : this.two;
+        this.many = this.many == null ? 0 : this.many;
     }
 
     @Builder
@@ -85,6 +91,8 @@ public class User {
         this.sit = dto.getSit();
         this.half = dto.getHalf();
         this.selfie = dto.getSelfie();
+        this.two = dto.getTwo();
+        this.many = dto.getMany();
         return this;
     }
 }
