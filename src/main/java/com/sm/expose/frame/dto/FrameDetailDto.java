@@ -28,6 +28,9 @@ public class FrameDetailDto {
     @ApiModelProperty(value = "프레임 카테고리", example = "[whole, half]")
     private List<String> categories;
 
+    @ApiModelProperty(value="좋아요 여부", example = "false")
+    private Boolean like_state;
+
 
     public static FrameDetailDto from(Frame frame){
         return FrameDetailDto.builder()
@@ -35,6 +38,7 @@ public class FrameDetailDto {
                 .frameName(frame.getFrameName())
                 .framePath(frame.getFramePath())
                 .s3FrameName(frame.getS3FrameName())
+                .like_state(false)
                 .build();
     }
 }

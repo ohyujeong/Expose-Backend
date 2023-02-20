@@ -102,7 +102,7 @@ public class FrameController {
         Map<String, Integer> sortCategories = frameService.sortByValue(categories);
 
         //정렬한 카테고리 기준으로 프레임 찾아주기
-        List<FrameDetailDto> responseData = frameService.getContentBasedFrame(sortCategories);
+        List<FrameDetailDto> responseData = frameService.getContentBasedFrame(user, sortCategories);
 //        FrameDetailDto test = frameService.getCollaborationFilter(user);
 
         return new EntityResponseDto.getFrameAllResponseDto(200, "추천 프레임 조회 성공", responseData);
