@@ -33,15 +33,19 @@ public class FrameController {
     private final CategoryService categoryService;
     private final UserDetailsServiceImpl userDetailsService;
 
-    @ApiOperation(value = "프레임 카테고리별 조회", notes = "프레임 카테고리별 조회 엔드 포인트")
+    @ApiOperation(value = "프레임 카테고리별 조회(회원)", notes = "프레임 카테고리별 조회 엔드 포인트")
     @ApiImplicitParam(name="category", value = "half,whole")
     @GetMapping()
-    public EntityResponseDto.getFrameAllResponseDto getFrameByCategory(
-            @RequestParam(name="category", required = false) String category) {
-
-        List<FrameDetailDto> responseData = frameService.getFramesByCategory(category);
+    public EntityResponseDto.getFrameAllResponseDto getFrameByCategory(@ApiIgnore Principal principal, @RequestParam(name="category", required = false) String category) {
+        if(principal != null){
+            User user = userDetailsService.findUser(principal);
+            List<FrameDetailDto> responseData = frameService.getFramesByCategory(user.getUserId(), category);
+            return new EntityResponseDto.getFrameAllResponseDto(200, "프레임 조회 성공", responseData);
+        }
+        List<FrameDetailDto> responseData = frameService.getFramesByCategory(0L, category);
         return new EntityResponseDto.getFrameAllResponseDto(200, "프레임 조회 성공", responseData);
     }
+
 
     @ApiOperation(value = "프레임 상세 조회", notes = "프레임 하나를 선택 해서 가져 온다.")
     @GetMapping("/{frameId}")

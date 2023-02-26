@@ -36,7 +36,7 @@ public class FrameService {
 
     }
 
-    public List<FrameDetailDto> getFramesByCategory(String categoryQuery){
+    public List<FrameDetailDto> getFramesByCategory(Long userId, String categoryQuery){
 
         //들어온 쿼리 카테고리 리스트로 만듦
         List <String> categories = Arrays.asList(categoryQuery.split(","));
@@ -57,10 +57,22 @@ public class FrameService {
 
         List<Long> removeDuplicateFrame = frameIdList.stream().distinct().collect(Collectors.toList());
 
+        //사용자가 좋아요한 프레임들
+        List<Long> LikeFrameIds = new ArrayList<>();
+        List<FrameUser> frameUsers = frameUserRepository.findByFrameUserLike(userId);
+
+        //좋아요한 프레임들의 아이디
+        for(int i=0; i<frameUsers.size(); i++){
+            LikeFrameIds.add(frameUsers.get(i).getFrame().getFrameId());
+        }
+
         for(int i=0; i<removeDuplicateFrame.size(); i++){
             Optional<Frame> frame = frameRepository.findById(removeDuplicateFrame.get(i));
             FrameDetailDto frameDetailDto = FrameDetailDto.from(frame.get());
             frameDetailDto.setCategories(this.getCategory(frame.get()));
+            if(LikeFrameIds.contains(removeDuplicateFrame.get(i))){
+                frameDetailDto.setLike_state(true);
+            }
             result.add(frameDetailDto);
         }
         return result;
@@ -413,6 +425,7 @@ public class FrameService {
 
         return categories;
     }
+
 
 //    public List<String> getUsers(Frame categoryFrame){
 //        Optional<Frame> frame = frameRepository.findById(categoryFrame.getFrameId());
