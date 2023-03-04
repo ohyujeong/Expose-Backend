@@ -15,12 +15,16 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Api(tags={"프레임 API"})
 @RestController
@@ -32,6 +36,18 @@ public class FrameController {
     private final FrameService frameService;
     private final CategoryService categoryService;
     private final UserDetailsServiceImpl userDetailsService;
+
+    @ApiOperation(value = "이미지 데이터 결과 받기 테스트 용")
+    @PostMapping(value = "/test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String test(@RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFile) throws IOException {
+        System.out.println(multipartFile);
+        if(multipartFile != null){
+            return "파일 개수 : " + multipartFile.size();
+        }
+        else{
+            return "file is null";
+        }
+    }
 
     @ApiOperation(value = "프레임 카테고리별 조회(회원)", notes = "프레임 카테고리별 조회 엔드 포인트")
     @ApiImplicitParam(name="category", value = "half,whole")
