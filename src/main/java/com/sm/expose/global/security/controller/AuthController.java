@@ -42,10 +42,11 @@ public class AuthController {
     }
 
 
-    @ApiOperation(value = "카카오 소셜 로그인 redirect")
+    @ApiOperation(value = "카카오 소셜 로그인 redirect", response = AuthResponse.class)
     @GetMapping("/oauth/callback/kakao")
     public ResponseEntity<ResponseMessage> oauth2AuthorizationKaKao(@RequestParam("code") String code) throws JsonProcessingException {
         AuthResponse authResponse = userDetailsService.oauth2AuthorizationGoogle(code);
+        System.out.println(authResponse);
         return new ResponseEntity<>(ResponseMessage.withData(200, "로그인 성공", authResponse), HttpStatus.OK);
     }
 }

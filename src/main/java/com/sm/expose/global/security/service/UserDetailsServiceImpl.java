@@ -114,8 +114,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Authentication auth = authManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(auth);
         String jwtToken = tokenProvider.createToken(auth);
-        System.out.println("jwtToken = " + jwtToken);
-        AuthResponse authResponse = new AuthResponse(jwtToken, user.getUserId());
+        AuthResponse authResponse = new AuthResponse(jwtToken, user.getUserId(), user.getNickname());
         return authResponse;
     }
 }
