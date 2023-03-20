@@ -22,6 +22,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,25 +108,30 @@ public class FrameController {
                     "카테고리 2개를 기준으로 2:1의 비율로 3개의 포즈를 추천해줌")
     @GetMapping("/recommend")
     public EntityResponseDto.getFrameAllResponseDto getRecommendFrame(@ApiIgnore Principal principal, @ApiIgnore Pageable pageable) {
+//회원 일 때
+        if(principal!=null){
+            User user = userDetailsService.findUser(principal);
+            HashMap<String, Integer> categories = new HashMap<String, Integer>();
+            categories.put("Whole", user.getWhole());
+            categories.put("Half", user.getHalf());
+            categories.put("Selfie", user.getSelfie());
+            categories.put("Sit", user.getSit());
+            categories.put("Two", user.getTwo());
+            categories.put("Many", user.getMany());
 
-        //유저한테서 선호 카테고리 정보 가져오기
-        User user = userDetailsService.findUser(principal);
-        HashMap<String, Integer> categories = new HashMap<String, Integer>();
-        categories.put("Whole", user.getWhole());
-        categories.put("Half", user.getHalf());
-        categories.put("Selfie", user.getSelfie());
-        categories.put("Sit", user.getSit());
-        categories.put("Two", user.getTwo());
-        categories.put("Many", user.getMany());
+            //제일 선호하는 순으로 정렬
+            Map<String, Integer> sortCategories = frameService.sortByValue(categories);
 
-        //제일 선호하는 순으로 정렬
-        Map<String, Integer> sortCategories = frameService.sortByValue(categories);
+            //정렬한 카테고리 기준으로 프레임 찾아주기
+            List<FrameDetailDto> responseData = frameService.getContentBasedFrame(user, sortCategories);
 
-        //정렬한 카테고리 기준으로 프레임 찾아주기
-        List<FrameDetailDto> responseData = frameService.getContentBasedFrame(user, sortCategories);
-//        FrameDetailDto test = frameService.getCollaborationFilter(user);
-
-        return new EntityResponseDto.getFrameAllResponseDto(200, "추천 프레임 조회 성공", responseData);
+            return new EntityResponseDto.getFrameAllResponseDto(200, "추천 프레임 조회 성공", responseData);
+        }
+        //비회원일때
+        else {
+            List<FrameDetailDto> responseData = frameService.getRandomFrame();
+            return new EntityResponseDto.getFrameAllResponseDto(200, "추천 프레임 조회 성공(비회원)", responseData);
+        }
     }
 
     @ApiOperation(value = "프레임 사용 횟수, 유저 취향 카테고리 업데이트",
@@ -143,30 +149,47 @@ public class FrameController {
     @PatchMapping("/like")
     public EntityResponseDto.messageResponse updateFrameUserLike(@ApiIgnore Principal principal, @RequestParam(name="frameId") long frameId) {
 
-        User user = userDetailsService.findUser(principal);
-        frameService.updateFrameUserLike(frameId, user);
+        if(principal != null){
+            User user = userDetailsService.findUser(principal);
+            frameService.updateFrameUserLike(frameId, user);
 
-        return new EntityResponseDto.messageResponse(200, "프레임 좋아요 성공");
+            return new EntityResponseDto.messageResponse(200, "프레임 좋아요 성공");
+        }
+        else{
+            return new EntityResponseDto.messageResponse(200, "프레임 좋아요 실패(비회원)");
+        }
     }
 
     @ApiOperation(value = "좋아요한 프레임 조회")
     @GetMapping("/like")
     public EntityResponseDto.getFrameAllResponseDto getFrameUserLike(@ApiIgnore Principal principal) {
 
-        User user = userDetailsService.findUser(principal);
-        List<FrameDetailDto> responseData = frameService.getFrameUserLike(user);
+        if(principal != null){
+            User user = userDetailsService.findUser(principal);
+            List<FrameDetailDto> responseData = frameService.getFrameUserLike(user);
 
-        return new EntityResponseDto.getFrameAllResponseDto(200, "좋아요한 프레임 조회 성공", responseData);
+            return new EntityResponseDto.getFrameAllResponseDto(200, "좋아요한 프레임 조회 성공", responseData);
+        }
+        else{
+            List<FrameDetailDto> responseData = new ArrayList<>();
+            return new EntityResponseDto.getFrameAllResponseDto(200, "좋아요한 프레임 조회 성공(비회원)", responseData);
+        }
+
     }
 
     @ApiOperation(value = "프레임 좋아요 취소")
     @PatchMapping("/like/cancel")
     public EntityResponseDto.messageResponse cancelFrameUserLike(@ApiIgnore Principal principal, @RequestParam(name="frameId") long frameId) {
 
-        User user = userDetailsService.findUser(principal);
-        frameService.cancelFrameUserLike(frameId, user);
+        if(principal !=null){
+            User user = userDetailsService.findUser(principal);
+            frameService.cancelFrameUserLike(frameId, user);
 
-        return new EntityResponseDto.messageResponse(200, "프레임 좋아요 취소 성공");
+            return new EntityResponseDto.messageResponse(200, "프레임 좋아요 취소 성공");
+        }
+        else{
+            return new EntityResponseDto.messageResponse(200, "프레임 좋아요 취소 성공(비회원)");
+        }
     }
 }
 

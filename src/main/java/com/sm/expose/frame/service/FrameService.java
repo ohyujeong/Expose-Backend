@@ -172,6 +172,52 @@ public class FrameService {
 //
 //    }
 
+    public List<FrameDetailDto> getRandomFrame(){
+
+        // 4개의 랜덤 프레임 ID를 추출해서 이 리스트에 넣어줌
+        // 제일 많이 나온 카테고리 + 그 다음 카테고리를 2:1 비율 + 랜덤 1개
+        List<Long> frameIdList = new ArrayList<>();
+
+        //일단 존재하는 모든 프레임 다 가져옴
+        List<Frame> frames = frameRepository.findAll();
+
+        //frame 추출여부를 true/false로 체크해서 랜덤 추출할 때 중복 제거
+        Boolean[] bool = new Boolean[frames.size()+1];
+        Arrays.fill(bool,false);
+
+        //모든 프레임들의 ID
+        List<Long> allFrameIds = new ArrayList<>();
+        for (Frame value : frames) {
+            allFrameIds.add(value.getFrameId());
+        }
+
+        Random random = new Random();
+        //프레임 랜덤으로 4개 뽑음
+        for(int i=0; i<4; i++){
+            int randomIndex = random.nextInt(frames.size());
+            int frameIndex = allFrameIds.get(randomIndex).intValue();
+            if(!bool[frameIndex]){
+                Long frameId = (long) frameIndex;
+                frameIdList.add(frameId);
+                bool[frameIndex] = true;
+            }
+            else if(bool[frameIndex] && frameIdList.size() <4){
+                i -=1;
+            }
+        }
+
+        List<FrameDetailDto> result = new ArrayList<>();
+
+        for(int i=0; i<frameIdList.size(); i++){
+            Optional<Frame> frame = frameRepository.findById(frameIdList.get(i));
+            FrameDetailDto frameDetailDto = FrameDetailDto.from(frame.get());
+            frameDetailDto.setCategories(this.getCategory(frame.get()));
+            result.add(frameDetailDto);
+        }
+    return result;
+    }
+
+
     public List<FrameDetailDto> getContentBasedFrame(User user, Map<String, Integer> hm){
 
         List<String> categories = new ArrayList<>();
